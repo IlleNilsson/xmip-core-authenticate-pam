@@ -1,12 +1,6 @@
 # xmip-core-authenticate-pam
 
-Authenticate by pam: verifies the credential through the host's PAM stack, refusing where there is none. A technology of
-[xmip-core-authenticate](https://github.com/IlleNilsson/xmip-core-authenticate).
-
-Declared and not yet written; `architecture.toml` carries the maturity. When
-it is written it implements `Authenticator`, one mechanism at one gate (ADR-0050).
-What it may depend on is `repository-model.md` section 4 and ADR-0044: its
-capability, and no sibling.
+Authenticate by PAM: proves a username and password through a PAM conversation, refusing where no PAM stack is reachable from this build. A technology of [xmip-core-authenticate](https://github.com/IlleNilsson/xmip-core-authenticate).
 
 ## Toolchain
 
