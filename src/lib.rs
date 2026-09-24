@@ -32,10 +32,8 @@ pub use stack::{InProcess, Stack, UNREACHABLE, Unreachable, Verdict};
 
 use authenticate::{AuthenticateError, Authenticator, Presented};
 use context::Verified;
+use identify::evidence::{self, PASSWORD};
 use xcore::{Mechanism, mechanism};
-
-/// The proof name this verifier reads off a `Presented`.
-pub const PROOF: &str = "password";
 
 /// Verifies a `username` claim with a `password` proof through a PAM stack.
 pub struct PamAuthenticator {
@@ -88,9 +86,9 @@ impl Authenticator for PamAuthenticator {
                 presented.mechanism.name()
             )));
         }
-        let password = presented.proof(PROOF).ok_or_else(|| {
+        let password = presented.proof(evidence::PASSWORD).ok_or_else(|| {
             AuthenticateError::new(format!(
-                "no '{PROOF}' proof was presented with the username '{}'",
+                "no '{PASSWORD}' proof was presented with the username '{}'",
                 presented.value
             ))
         })?;
@@ -131,7 +129,7 @@ mod tests {
     }
 
     fn claim(username: &str, password: &str) -> Presented {
-        Presented::passed(mechanism::username(), username).with_proof(PROOF, password)
+        Presented::passed(mechanism::username(), username).with_proof(evidence::PASSWORD, password)
     }
 
     #[test]
@@ -162,7 +160,8 @@ mod tests {
             Verified::Proven
         );
         // A claim the first gate already filed under this mechanism reads too.
-        let filed = Presented::passed(mechanism::pam(), "alice").with_proof(PROOF, "pencil");
+        let filed =
+            Presented::passed(mechanism::pam(), "alice").with_proof(evidence::PASSWORD, "pencil");
         assert_eq!(verifier.verify(&filed).expect("verified"), Verified::Proven);
     }
 
@@ -222,7 +221,8 @@ mod tests {
     #[test]
     fn through_the_gate_the_refusal_carries_the_reason_to_the_operator() {
         let acceptance = Acceptance::closed().accepting(&mechanism::pam());
-        let filed = Presented::passed(mechanism::pam(), "alice").with_proof(PROOF, "pencil");
+        let filed =
+            Presented::passed(mechanism::pam(), "alice").with_proof(evidence::PASSWORD, "pencil");
 
         let bound = verifier();
         let identity = authenticate(&acceptance, &[&bound], &Registry, &filed).expect("accepted");
