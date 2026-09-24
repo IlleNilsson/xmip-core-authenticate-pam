@@ -30,8 +30,9 @@ pub mod stack;
 pub use conversation::{Conversation, Credential, Prompt};
 pub use stack::{InProcess, Stack, UNREACHABLE, Unreachable, Verdict};
 
-use authenticate::{AuthenticateError, Authenticator, Presented};
+use authenticate::{AuthenticateError, Authenticator};
 use context::Verified;
+use identify::Presented;
 use identify::evidence::{self, PASSWORD};
 use xcore::{Mechanism, mechanism};
 
