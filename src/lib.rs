@@ -68,25 +68,13 @@ impl PamAuthenticator {
     }
 }
 
-/// Whether a claim is one this verifier reads: a bare `username`, or one
-/// the first gate already filed under `pam`.
-fn reads(mechanism: &Mechanism) -> bool {
-    let name = mechanism.name();
-    name == "username" || name == "pam"
-}
-
 impl Authenticator for PamAuthenticator {
     fn mechanism(&self) -> Mechanism {
         mechanism::pam()
     }
 
     fn verify(&self, presented: &Presented) -> Result<Verified, AuthenticateError> {
-        if !reads(&presented.mechanism) {
-            return Err(AuthenticateError::new(format!(
-                "'{}' is not a claim the PAM verifier reads: it takes a username",
-                presented.mechanism.name()
-            )));
-        }
+        authenticate::account::user_claim(presented, &self.mechanism())?;
         let password = presented.proof(evidence::PASSWORD).ok_or_else(|| {
             AuthenticateError::new(format!(
                 "no '{PASSWORD}' proof was presented with the username '{}'",
