@@ -110,6 +110,7 @@ mod tests {
     use super::*;
     use authenticate::store::CredentialStore;
     use authenticate::{Acceptance, PartyRegistry, Refusal, authenticate};
+    use std::assert_matches;
     use xcore::{PartyId, Purpose};
 
     fn verifier() -> PamAuthenticator {
@@ -220,8 +221,9 @@ mod tests {
         let unbound = PamAuthenticator::new("xmip");
         let refusal =
             authenticate(&acceptance, &[&unbound], &Registry, &filed).expect_err("refused");
-        assert!(
-            matches!(&refusal, Refusal::NotProven { detail, .. } if detail.contains(UNREACHABLE)),
+        assert_matches!(
+            &refusal,
+            Refusal::NotProven { detail, .. } if detail.contains(UNREACHABLE),
             "{refusal}"
         );
     }
